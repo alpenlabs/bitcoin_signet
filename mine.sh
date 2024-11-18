@@ -1,12 +1,11 @@
 #!/bin/bash
+source setup-mineto-address.sh
+
 NBITS=${NBITS:-"1e0377ae"} #minimum difficulty in signet
 
 while true; do
-    if [[ -f "${BITCOIN_DIR}/MINE_ADDRESS.txt" ]]; then
-        ADDR=$(cat ~/.bitcoin/MINE_ADDRESS.txt)
-    else
-        ADDR=${MINETO:-$(bitcoin-cli getnewaddress)}
-    fi
+    # Get address to receive miner reward.
+    ADDR=$(get_next_address)
     if [[ -f "${BITCOIN_DIR}/BLOCKPRODUCTIONDELAY.txt" ]]; then
         BLOCKPRODUCTIONDELAY_OVERRIDE=$(cat ~/.bitcoin/BLOCKPRODUCTIONDELAY.txt)
         echo "Delay OVERRIDE before next block" $BLOCKPRODUCTIONDELAY_OVERRIDE "seconds."
@@ -19,5 +18,6 @@ while true; do
         fi
     fi
     echo "Mine To:" $ADDR
-    miner --cli="bitcoin-cli" generate --grind-cmd="bitcoin-util grind" --address=$ADDR --nbits=$NBITS --set-block-time=$(date +%s)
+    # We must specify rpcwallet when multiple wallets are loaded
+    miner --cli="bitcoin-cli -rpcwallet=custom_signet" generate --grind-cmd="bitcoin-util grind" --address=$ADDR --nbits=$NBITS --set-block-time=$(date +%s)
 done

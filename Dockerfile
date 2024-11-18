@@ -59,6 +59,8 @@ ENV MINERENABLED=${MINERENABLED:-"1"}
 ENV MINETO=${MINETO:-""}
 ENV EXTERNAL_IP=${EXTERNAL_IP:-""} 
 
+# Variable used to generate wallets used by bridge operators
+ENV NUM_WALLETS=${NUM_WALLETS:-5}
 VOLUME $BITCOIN_DIR
 EXPOSE 28332 28333 28334 38332 38333 38334
 RUN  apt-get update && \
@@ -66,6 +68,7 @@ RUN  apt-get update && \
      apt-get clean
 COPY --from=builder "/tmp/bin" /usr/local/bin 
 COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY setup-mineto-address.sh /usr/local/bin/setup-mineto-address.sh
 COPY miner_imports /usr/local/bin
 COPY miner /usr/local/bin/miner
 COPY *.sh /usr/local/bin/
