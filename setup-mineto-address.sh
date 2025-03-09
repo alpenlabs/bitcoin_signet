@@ -100,3 +100,9 @@ get_next_address() {
     echo "$next_address"
 }
 # echo "Next Address" $(get_next_address)
+
+# get first address
+get_first_address() {
+    load_addresses
+    echo ${addresses[0]}
+}

@@ -2,7 +2,9 @@
 source setup-mineto-address.sh
 
 NBITS=${NBITS:-"1e0377ae"} #minimum difficulty in signet
-ADDR=$(get_next_address)    # It will get the first address from the wallet ie. cusomt_signet
+ADDR=$(get_first_address)    # It will get the first address from the wallet ie. custom_signet
+
+echo "Starting mining with address $ADDR"
 
 # Initial mining of 100 blocks if blocks count is less than 100
 BLOCKS_COUNT=$(bitcoin-cli -rpcwallet=custom_signet getblockcount)
