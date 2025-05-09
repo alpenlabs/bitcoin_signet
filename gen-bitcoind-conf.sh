@@ -40,9 +40,14 @@ v2transport=1
 discover=1
 signetblocktime=$BLOCKPRODUCTIONDELAY
 signetchallenge=$SIGNETCHALLENGE
+
+zmqpubhashblock=$ZMQPUBHASHBLOCK
 zmqpubrawblock=$ZMQPUBRAWBLOCK
 zmqpubrawtx=$ZMQPUBRAWTX
+zmqpubhashtx=$ZMQPUBHASHTX
 zmqpubhashblock=$ZMQPUBHASHBLOCK
+zmqpubsequence=$ZMQPUBSEQUENCE
+
 rpcbind=$RPCBIND
 rpcallowip=$RPCALLOWIP
 whitelist=$WHITELIST
