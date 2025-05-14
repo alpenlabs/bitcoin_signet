@@ -2,9 +2,6 @@ DATADIR=${DATADIR:-"regtest-temp"}
 BITCOINCLI=${BITCOINCLI:-"bitcoin-cli -regtest -datadir=$DATADIR "}
 BITCOIND=${BITCOIND:-"bitcoind -datadir=$DATADIR -regtest -daemon"}
 
-echo "--------------x------------"
-echo $MNEMONIC
-
 write_files() { 
     echo "SIGNETCHALLENGE=" $SIGNETCHALLENGE
     echo $ADDR > $BITCOIN_DIR/ADDR.txt
