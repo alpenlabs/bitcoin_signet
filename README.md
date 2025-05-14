@@ -32,8 +32,6 @@ Versions prior to 29.0 were using BDB wallet, system will automaticly update you
   - If `~/.bitcoin/BLOCKPRODUCTIONDELAY.txt` is present, this value will be used, allowing dynamic changes.
 - `MINERENABLED`: Flag to enable the mining chain. (**mining mode only**)
 - `NBITS`: Sets the minimum difficulty in mining. (**mining mode only**)
-- `PRIVKEY`: Private key of the Signet signer. If `MINERENABLED=1` and not provided, it will be generated. (**mining mode only**)
-- `PRIVKEY_MODE`: `descriptor` - provide descriptors (wallets from >=v29.0) or `legacy` - provide WIF (method used prior to <v29.0 to init signet challenge)
 - `MINETO`: Address to mine to. If not provided, a new address will be generated for each block. (**mining mode only**)
 - `SIGNETCHALLENGE`: Sets the valid block producer for this Signet. Required for client-mode.
 - If `MINERENABLED=1` and not provided, it will be generated. If provided, `PRIVKEY` must also be populated.
