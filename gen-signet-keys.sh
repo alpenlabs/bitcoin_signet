@@ -50,7 +50,7 @@ if [[ "$MINERENABLED" == "1" ]]; then
         rm -rf $DATADIR
     else
         echo "$SIGNETCHALLENGE" > $BITCOIN_DIR/SIGNETCHALLENGE.txt
-        echo "Imported signetchallange and privkey being used."
+        echo "Imported signetchallange being used."
     fi
 fi
 
