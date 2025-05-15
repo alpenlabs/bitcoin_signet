@@ -84,9 +84,6 @@ def main():
     # Concatenate entries into a compact JSON array string
     concat_descriptors = "[" + ",".join(entry.to_string() for entry in descriptor_entries) + "]"
 
-    # # Write final output to file
-    # with open("file.dat", "w") as f:
-    #     f.write(concat_descriptors)
     print(concat_descriptors)
 
 

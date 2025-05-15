@@ -7,7 +7,6 @@ GRIND="bitcoin-util grind"
 NBITS=${NBITS:-"1e0377ae"} #minimum difficulty in signet
 
 echo "Waiting until Chain tip age is < $CHAIN_TIP_AGE seconds before mining start..."
-# wait_chain_sync.sh $CHAIN_TIP_AGE
 while true; do
     ADDR=${MINETO:-$(bitcoin-cli getnewaddress)}
     echo "Mining to address:" $ADDR
