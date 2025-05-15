@@ -28,7 +28,7 @@ ENV BITCOIN_DIR /root/.bitcoin
 
 ENV NBITS=${NBITS}
 ENV SIGNETCHALLENGE=${SIGNETCHALLENGE}
-ENV MNEMONIC=${MNEMONIC:-"clever mom top drop twice nasty robot grid gap alley sock anxiety fortune sudden hospital"}
+ENV MNEMONIC=${MNEMONIC:-"bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon bacon"}
 ENV CHAIN_TIP_AGE=${CHAIN_TIP_AGE:-"0"}
 ENV MINE_GENESIS=${MINE_GENESIS:-"0"}
 ENV RPCUSER=${RPCUSER:-"bitcoin"}
