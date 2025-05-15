@@ -3,8 +3,6 @@ BITCOINCLI=${BITCOINCLI:-"bitcoin-cli -regtest -datadir=$DATADIR "}
 BITCOIND=${BITCOIND:-"bitcoind -datadir=$DATADIR -regtest -daemon"}
 
 write_files() { 
-    echo "PRIVKEY=" 
-    cat $BITCOIN_DIR/PRIVKEY.txt
     echo "SIGNETCHALLENGE=" $SIGNETCHALLENGE
     echo $ADDR > $BITCOIN_DIR/ADDR.txt
     echo $PUBKEY > $BITCOIN_DIR/PUBKEY.txt
@@ -12,7 +10,7 @@ write_files() {
 }
 
 if [[ "$MINERENABLED" == "1" ]]; then
-    if [[ ("$SIGNETCHALLENGE" == "" || "$PRIVKEY" == "") ]]; then
+    if [[ ("$SIGNETCHALLENGE" == "") ]]; then
         echo "Generating new signetchallange and privkey."
         #clean if exists
         rm -rf $DATADIR
@@ -33,8 +31,12 @@ if [[ "$MINERENABLED" == "1" ]]; then
         #wait a bit for startup
         sleep 5s
         
-        #create wallet
-        $BITCOINCLI -named createwallet wallet_name="temp" descriptors=true
+        # create wallet
+        $BITCOINCLI -named createwallet wallet_name="temp" descriptors=true blank=true
+        
+        # get descriptor from MNEMONIC
+        $BITCOINCLI -named importdescriptors $(mnemonic-to-descriptor.py "$MNEMONIC" --runner "$BITCOINCLI")
+
         #Get the signet script from the 86 descriptor
         ADDR=$($BITCOINCLI getnewaddress)
         SIGNETCHALLENGE=$($BITCOINCLI getaddressinfo $ADDR | jq -r ".scriptPubKey")
@@ -47,9 +49,8 @@ if [[ "$MINERENABLED" == "1" ]]; then
         #cleanup
         rm -rf $DATADIR
     else
-        echo "$PRIVKEY" > $BITCOIN_DIR/PRIVKEY.txt
         echo "$SIGNETCHALLENGE" > $BITCOIN_DIR/SIGNETCHALLENGE.txt
-        echo "Imported signetchallange and privkey being used."
+        echo "Imported signetchallange being used."
     fi
 fi
 
