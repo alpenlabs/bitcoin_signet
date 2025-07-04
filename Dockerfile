@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.authors="NBD"
 LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.source="https://github.com/nbd-wtf/bitcoin_signet"
 
-ENV BITCOIN_DIR /root/.bitcoin 
+ENV BITCOIN_DIR=/root/.bitcoin 
 
 ENV NBITS=${NBITS}
 ENV SIGNETCHALLENGE=${SIGNETCHALLENGE}
