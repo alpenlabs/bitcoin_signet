@@ -1,18 +1,27 @@
 SIGNETCHALLENGE=${SIGNETCHALLENGE:-$(cat ~/.bitcoin/SIGNETCHALLENGE.txt)}
 
-RPCAUTH=$(/usr/local/bin/rpcauth.py $RPCUSER $RPCPASSWORD | tr -d '\n')
-echo "signet=1"
 
-if [[ "$COOKIEFILE" == "true" ]]; then
+
+BITCOIN_DIR="${BITCOIN_DIR:-/root/.bitcoin}"
+BITCOIN_CONF="${BITCOIN_DIR}/bitcoin.conf"
+
+
+# Check if CONF_CONTENT environment variable is set (mounted from a ConfigMap)
+if [[ -n "$CONF_CONTENT" ]]; then
+  echo "$CONF_CONTENT" > "$BITCOIN_CONF"
+else
+  RPCAUTH=$(/usr/local/bin/rpcauth.py $RPCUSER $RPCPASSWORD | tr -d '\n')
+  echo "signet=1"
+
+  if [[ "$COOKIEFILE" == "true" ]]; then
 echo "rpccookiefile=/root/.bitcoin/.cookie
 rpcauth=$RPCAUTH"
-else
-echo "rpcauth=$RPCAUTH
-rpcuser=$RPCUSER
+  else
+echo "rpcuser=$RPCUSER
 rpcpassword=$RPCPASSWORD"
-fi
+  fi
 
-echo "txindex=1
+  echo "txindex=1
 blockfilterindex=1
 peerblockfilters=1
 coinstatsindex=1
@@ -23,14 +32,14 @@ rpcthreads=$RPCTHREADS
 rpcservertimeout=$RPCSERVERTIMEOUT
 rpcworkqueue=$RPCWORKQUEUE"
 
-if [[ "$EXTERNAL_IP" != "" ]]; then
-    echo $EXTERNAL_IP | tr ',' '\n' | while read ip; do
-        echo "externalip=$ip"
-    done
-fi
+  if [[ "$EXTERNAL_IP" != "" ]]; then
+      echo $EXTERNAL_IP | tr ',' '\n' | while read ip; do
+          echo "externalip=$ip"
+      done
+  fi
 
-echo "[signet]
-daemon=1
+  echo "[signet]
+daemon=0
 listen=1
 server=1
 discover=1
@@ -49,26 +58,28 @@ v2transport=1
 minrelaytxfee=0.0
 blockmintxfee=0.0
 dustRelayFee=0.0
-maxtxfee=$MAXTXFEE"
+maxtxfee=$MAXTXFEE
+debug=1"
 
-if [[ "$ADDNODE" != "" ]]; then
-    echo $ADDNODE | tr ',' '\n' | while read node; do
-        echo "addnode=$node"
-    done
-fi
- 
+  if [[ "$ADDNODE" != "" ]]; then
+      echo $ADDNODE | tr ',' '\n' | while read node; do
+          echo "addnode=$node"
+      done
+  fi
+   
 
-if [[ "$I2PSAM" != "" ]]; then
-    echo "i2psam=$I2PSAM"
-fi
-if [[ "$ONIONPROXY" != "" ]]; then
-    echo "onion=$ONIONPROXY" # unless have static IP won't resolve the control port as domain
-fi
+  if [[ "$I2PSAM" != "" ]]; then
+      echo "i2psam=$I2PSAM"
+  fi
+  if [[ "$ONIONPROXY" != "" ]]; then
+      echo "onion=$ONIONPROXY" # unless have static IP won't resolve the control port as domain
+  fi
 
-if [[ "$TORPASSWORD" != "" ]]; then
-    echo "torpassword=$TORPASSWORD"
-fi
+  if [[ "$TORPASSWORD" != "" ]]; then
+      echo "torpassword=$TORPASSWORD"
+  fi
 
-if [[ "$TORCONTROL" != "" ]]; then
-    echo "torcontrol=$TORCONTROL"
+  if [[ "$TORCONTROL" != "" ]]; then
+      echo "torcontrol=$TORCONTROL"
+  fi
 fi
