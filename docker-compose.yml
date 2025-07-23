@@ -5,51 +5,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # env_file: 
-    #   .env
     environment:
       RPCUSER: user
       RPCPASSWORD: password
-      MNEMONIC: "sense xxx xxx bone"
+      MNEMONIC: "xxxxx"
       MINERENABLED: "1"
       MAXTXFEE: "10"
-      SIGNETCHALLENGE: 
-      CONF_CONTENT: |
-        signet=1
-        rpcuser=xxxxxxx
-        rpcpassword=xxxxxxxx
-        txindex=1
-        blockfilterindex=1
-        peerblockfilters=1
-        coinstatsindex=1
-        dnsseed=0
-        persistmempool=1
-        uacomment=CustomSignet
-        rpcthreads=16
-        rpcservertimeout=600
-        rpcworkqueue=50
-        [signet]
-        daemon=0
-        listen=1
-        server=1
-        discover=1
-        signetchallenge=001410a5794fa24c97ca81f41065454d2362b416a073
-        zmqpubrawblock=tcp://0.0.0.0:28334
-        zmqpubrawtx=tcp://0.0.0.0:28335
-        zmqpubhashtx=tcp://0.0.0.0:28333
-        zmqpubhashblock=tcp://0.0.0.0:28332
-        zmqpubsequence=tcp://0.0.0.0:28336
-        rpcbind=0.0.0.0:38332
-        rpcallowip=0.0.0.0/0
-        whitelist=0.0.0.0/0
-        fallbackfee=0.0002
-        acceptnonstdtxn=1
-        v2transport=1
-        minrelaytxfee=0.0
-        blockmintxfee=0.0
-        dustRelayFee=0.0
-        maxtxfee=10
-        debug=1
+      SIGNETCHALLENGE: 0014ce1329a95b72aa4c23c5210965e72a56e5966514
+      
+    volumes: 
+      - ./bitcoin.conf:/root/.bitcoin/bitcoin.conf
     ports:
       - "28332:28332"
       - "28333:28333"
@@ -57,7 +22,3 @@ services:
       - "38332:38332"
       - "38333:38333"
       - "38334:38334"
-# 001410a5794fa24c97ca81f41065454d2362b416a073
-
-
-# python3 -c "from mnemonic import Mnemonic; print(Mnemonic('english').generate(256))"
