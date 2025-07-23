@@ -1,9 +1,14 @@
+source patch-creds.sh
+
 touch ${BITCOIN_DIR}/uses_modern_wallet
 echo "Generate or import keyset"
 gen-signet-keys.sh
 SIGNETCHALLENGE=${SIGNETCHALLENGE:-$(cat ~/.bitcoin/SIGNETCHALLENGE.txt)}
-if [[ -f "$BITCOIN_DIR/bitcoin.conf" ]]; then
-  echo "Using existing bitcoin.conf from $BITCOIN_DIR"
+
+BITCOIN_CONF="$BITCOIN_DIR/bitcoin.conf"
+if [[ -f "$BITCOIN_CONF" ]]; then
+  echo "📄 Found mounted bitcoin.conf"
+  patch_rpc_credentials
 else 
   echo "Generate bitcoind configuration"
   gen-bitcoind-conf.sh >${BITCOIN_DIR}/bitcoin.conf
