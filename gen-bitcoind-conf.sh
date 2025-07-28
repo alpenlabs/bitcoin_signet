@@ -1,4 +1,4 @@
-
+SIGNETCHALLENGE=${SIGNETCHALLENGE:-$(cat ~/.bitcoin/SIGNETCHALLENGE.txt)}
 
 
 BITCOIN_DIR="${BITCOIN_DIR:-/root/.bitcoin}"

@@ -20,7 +20,6 @@ if [[ ! -f "${BITCOIN_DIR}/install_done" ]]; then
 else
   echo "install_done file exists, skipping setup process."
   
-  SIGNETCHALLENGE=${SIGNETCHALLENGE:-$(cat ~/.bitcoin/SIGNETCHALLENGE.txt)}
   BITCOIN_CONF="$BITCOIN_DIR/bitcoin.conf"
   if [[ -f "$BITCOIN_CONF" ]]; then
     echo "📄 Found mounted bitcoin.conf"
