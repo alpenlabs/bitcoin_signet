@@ -6,13 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      RPCUSER: user
-      RPCPASSWORD: password
-      MNEMONIC: "xxxxx"
       MINERENABLED: "1"
       MAXTXFEE: "10"
-      SIGNETCHALLENGE: 0014ce1329a95b72aa4c23c5210965e72a56e5966514
-      
+      SIGNETCHALLENGE: ""
+    env_file: ".env"      
     volumes: 
       - ./bitcoin.conf:/root/.bitcoin/bitcoin.conf
     ports:
