@@ -2,7 +2,7 @@ FROM debian:bookworm-slim as builder
 
 ARG BITCOIN_VERSION=${BITCOIN_VERSION:-29.0}
 ARG TARGETPLATFORM 
-
+ARG MNEMONIC
 RUN  apt-get update && \
      apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu wget libc6 procps python3
 WORKDIR /tmp
@@ -28,7 +28,7 @@ ENV BITCOIN_DIR=/root/.bitcoin
 
 ENV NBITS=${NBITS}
 ENV SIGNETCHALLENGE=${SIGNETCHALLENGE}
-ENV MNEMONIC=${MNEMONIC:? Please set MNEMONIC env var}
+ENV MNEMONIC=${MNEMONIC:-""}
 ENV CHAIN_TIP_AGE=${CHAIN_TIP_AGE:-"0"}
 ENV MINE_GENESIS=${MINE_GENESIS:-"0"}
 ENV RPCUSER=${RPCUSER:-"bitcoin"}
