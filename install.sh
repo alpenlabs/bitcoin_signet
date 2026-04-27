@@ -1,8 +1,14 @@
 touch ${BITCOIN_DIR}/uses_modern_wallet
 echo "Generate or import keyset"
 gen-signet-keys.sh
-echo "Generate bitcoind configuration"
-gen-bitcoind-conf.sh >${BITCOIN_DIR}/bitcoin.conf
+
+BITCOIN_CONF="$BITCOIN_DIR/bitcoin.conf"
+if [[ -f "$BITCOIN_CONF" ]]; then
+  echo "📄 Found mounted bitcoin.conf"
+else 
+  echo "Generate bitcoind configuration"
+  gen-bitcoind-conf.sh >${BITCOIN_DIR}/bitcoin.conf
+fi
 echo "Setup Signet"
 setup-signet.sh
 

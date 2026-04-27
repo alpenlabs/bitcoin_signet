@@ -1,0 +1,21 @@
+services:
+  bitcoind-miner:
+    container_name: bitcoin-miner
+    # image: alpen_signet:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MINERENABLED: "1"
+      MAXTXFEE: "10"
+      SIGNETCHALLENGE: ""
+    env_file: ".env"      
+    volumes: 
+      - ./bitcoin.conf:/root/.bitcoin/bitcoin.conf
+    ports:
+      - "28332:28332"
+      - "28333:28333"
+      - "28334:28334"
+      - "38332:38332"
+      - "38333:38333"
+      - "38334:38334"

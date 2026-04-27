@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eo pipefail
 
+# source patch-creds.sh
+source utils.sh
+
 shutdown_gracefully(){
 
   echo "Container is shutting down, lets make sure bitcoind flushes the db."
@@ -16,9 +19,22 @@ if [[ ! -f "${BITCOIN_DIR}/install_done" ]]; then
   install.sh #this is config based on args passed into mining node or peer.
 else
   echo "install_done file exists, skipping setup process."
-  gen-bitcoind-conf.sh >~/.bitcoin/bitcoin.conf
+  
+  BITCOIN_CONF="$BITCOIN_DIR/bitcoin.conf"
+  if [[ -f "$BITCOIN_CONF" ]]; then
+    echo "📄 Found mounted bitcoin.conf"
+    # assert that the challenges match, if not exit with proper message.
+    # This assertion is called only after ensuring both files (bitcoin.conf, SIGNETCHALLENGE.txt) exist.
+    if ! assert_signetchallenge_match; then
+      echo "Exiting due to signetchallenge mismatch or missing config."
+      exit 1
+    fi
+  else 
+    echo "Generate bitcoind configuration"
+    gen-bitcoind-conf.sh >${BITCOIN_DIR}/bitcoin.conf
+  fi
 fi
-    
+
 $@ &
 echo "Infinite loop"
 while true
