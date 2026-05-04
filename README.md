@@ -76,7 +76,23 @@ Versions prior to 29.0 were using BDB wallet, system will automaticly update you
    docker build -t bitcoin-signet .
    ```
 
-2. **Running the Docker Image**:
+   Multi-arch (`linux/amd64` + `linux/arm64`) build via buildx:
+
+   ```bash
+   docker buildx build --platform linux/amd64,linux/arm64 -t bitcoin-signet .
+   ```
+
+   The `Dockerfile` selects the matching `bitcoind` binary tarball from bitcoincore.org based on `TARGETPLATFORM`, so both architectures build from the same source without changes.
+
+2. **Pre-built Image**:
+
+   Multi-arch images are published to GHCR on every push to `main` and on every `v*` tag:
+
+   ```bash
+   docker pull ghcr.io/alpenlabs/bitcoin_signet:latest
+   ```
+
+3. **Running the Docker Image**:
    ```bash
    docker run -d --name bitcoin-signet-instance bitcoin-signet
    ```
