@@ -1,0 +1,135 @@
+# Builds the custom-signet bitcoind image and pushes to ECR Public on
+# merge to main (or manual dispatch).
+#
+# Pushes to: public.ecr.aws/alpenlabs/signet
+# Tag scheme:
+#   - sha-<short>  for every main push
+#   - latest       on main pushes
+#   - <custom>     when triggered via workflow_dispatch with `tag` input
+
+name: CI — Build and Push Signet Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Dockerfile"
+      - "docker-entrypoint.sh"
+      - "*.sh"
+      - "miner"
+      - "miner_imports/**"
+      - "*.py"
+      - ".github/workflows/ci-build.yml"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Custom tag to push (default: sha-<short>)"
+        required: false
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+  ECR_PUBLIC_REGISTRY: public.ecr.aws/alpenlabs
+  IMAGE_NAME: signet
+
+# Cancel in-progress runs for the same ref (except main)
+concurrency:
+  group: ci-build-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  build-and-push:
+    name: Build and push signet image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # required for OIDC
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v5
+        with:
+          persist-credentials: false
+
+      - name: Resolve image tag
+        id: resolve
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          INPUT_TAG="${{ inputs.tag }}"
+          if [ -n "$INPUT_TAG" ]; then
+            FINAL_TAG="$INPUT_TAG"
+          else
+            FINAL_TAG="sha-${SHORT_SHA}"
+          fi
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "tag=${FINAL_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: ${FINAL_TAG} (commit ${SHORT_SHA})"
+
+      - name: Set up QEMU (multi-arch emulation)
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v4
+        with:
+          role-to-assume: arn:aws:iam::496607027995:role/github-actions-ecr-push
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        run: |
+          aws ecr-public get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: Build and push multi-arch image
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+          SHORT_SHA: ${{ steps.resolve.outputs.short_sha }}
+        run: |
+          FULL_IMAGE="${{ env.ECR_PUBLIC_REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}"
+
+          # Build extra tag args:
+          #   - sha-<short>: always (for traceability)
+          #   - latest: only on main push
+          EXTRA_TAGS=()
+          if [ "${TAG}" != "sha-${SHORT_SHA}" ]; then
+            EXTRA_TAGS+=( -t "${{ env.ECR_PUBLIC_REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${SHORT_SHA}" )
+          fi
+          if [ "${{ github.ref }}" = "refs/heads/main" ] && [ "${{ github.event_name }}" = "push" ]; then
+            EXTRA_TAGS+=( -t "${{ env.ECR_PUBLIC_REGISTRY }}/${{ env.IMAGE_NAME }}:latest" )
+          fi
+
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --push \
+            -t "${FULL_IMAGE}" \
+            "${EXTRA_TAGS[@]}" \
+            -f Dockerfile .
+
+          echo "Pushed: ${FULL_IMAGE}"
+          for t in "${EXTRA_TAGS[@]}"; do
+            [ "$t" != "-t" ] && echo "Pushed: $t"
+          done
+
+      - name: Build summary
+        if: always()
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+          SHORT_SHA: ${{ steps.resolve.outputs.short_sha }}
+        run: |
+          {
+            echo "## Signet Image Build"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| **Commit** | \`${{ github.sha }}\` |"
+            echo "| **Short SHA** | \`${SHORT_SHA}\` |"
+            echo "| **Pushed Tag** | \`${TAG}\` |"
+            echo "| **Ref** | \`${{ github.ref_name }}\` |"
+            echo "| **Event** | \`${{ github.event_name }}\` |"
+            echo "| **Image** | \`${{ env.ECR_PUBLIC_REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}\` |"
+            echo "| **Platforms** | linux/amd64, linux/arm64 |"
+          } >> "$GITHUB_STEP_SUMMARY"
