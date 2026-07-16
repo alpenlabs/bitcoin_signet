@@ -54,8 +54,7 @@ v2transport=1
 minrelaytxfee=0.0
 blockmintxfee=0.0
 dustRelayFee=0.0
-maxtxfee=$MAXTXFEE
-debug=1"
+maxtxfee=$MAXTXFEE"
 
 if [[ "$ADDNODE" != "" ]]; then
     echo $ADDNODE | tr ',' '\n' | while read node; do
