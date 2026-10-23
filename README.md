@@ -21,8 +21,11 @@
 
 Bitcoin Signet provides a sandboxed environment for Bitcoin, allowing developers and testers to simulate the Bitcoin network without the risks associated with the main or test networks. This Docker image facilitates the deployment and configuration of a Signet node, offering a range of customizable options through environment variables.
 
+The image ships Bitcoin Core 31.0 (`BITCOIN_VERSION` in the `Dockerfile`).
+
 Versions prior to 29.0 were using BDB wallet, system will automaticly update your wallet to new descriptor format.
 `PRIVKEY` prior to 29.0 was a WIF, now is descriptor on new wallets. 
+Bitcoin Core 30.0 and later cannot load legacy BDB wallets; convert any that remain with the `migratewallet` RPC.
 
 ## 🛠 Environment Variables
 

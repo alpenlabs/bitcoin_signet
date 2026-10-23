@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim as builder
 
-ARG BITCOIN_VERSION=${BITCOIN_VERSION:-29.0}
+ARG BITCOIN_VERSION=${BITCOIN_VERSION:-31.0}
 ARG TARGETPLATFORM 
 
 RUN  apt-get update && \
